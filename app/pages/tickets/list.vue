@@ -38,13 +38,14 @@ const { data: allTickets, refresh: refreshTickets, pending: loadingTickets } = a
 const { data: systemUsers } = await useFetch<SystemUser[]>('/api/users')
 
 const TAB_STATUSES = ['open', 'in_progress', 'closed'] as const
+type TabStatus = typeof TAB_STATUSES[number]
 const tabItems = [
-  { label: 'Abertos', slot: 'open' as const, icon: 'i-lucide-inbox' },
-  { label: 'Em Andamento', slot: 'in_progress' as const, icon: 'i-lucide-clock' },
-  { label: 'Fechados', slot: 'closed' as const, icon: 'i-lucide-check-circle' },
+  { label: 'Abertos', slot: 'open' as const, value: 'open', icon: 'i-lucide-inbox' },
+  { label: 'Em Andamento', slot: 'in_progress' as const, value: 'in_progress', icon: 'i-lucide-clock' },
+  { label: 'Fechados', slot: 'closed' as const, value: 'closed', icon: 'i-lucide-check-circle' },
 ]
-const activeTabIndex = ref(0)
-const activeStatus = computed(() => TAB_STATUSES[activeTabIndex.value])
+const activeTabIndex = ref<TabStatus>('open')
+const activeStatus = computed(() => activeTabIndex.value)
 
 const globalFilter = ref('')
 const page = ref(1)
@@ -135,7 +136,7 @@ async function addAssignee() {
   if (!selectedTicket.value || !selectedUserId.value) return
   addingAssignee.value = true
   try {
-    const result = await $fetch(`/api/tickets/${selectedTicket.value.id}/assignees`, {
+    const result = await $fetch(`/api/tickets/${selectedTicket.value.id}/assignees` as string, {
       method: 'POST',
       body: { userId: selectedUserId.value },
     }) as { userId: string; userName: string | null; userEmail: string; userImage: string | null }
@@ -152,7 +153,7 @@ async function addAssignee() {
 async function removeAssignee(userId: string) {
   if (!selectedTicket.value) return
   try {
-    await $fetch(`/api/tickets/${selectedTicket.value.id}/assignees?userId=${userId}`, {
+    await $fetch(`/api/tickets/${selectedTicket.value.id}/assignees?userId=${userId}` as string, {
       method: 'DELETE',
     })
     selectedTicket.value.assignees = selectedTicket.value.assignees.filter(a => a.userId !== userId)
