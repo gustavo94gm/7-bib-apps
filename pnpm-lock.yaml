@@ -11,6 +11,9 @@ importers:
       '@better-auth/drizzle-adapter':
         specifier: ^1.7.1
         version: 1.7.1(@better-auth/core@1.7.1(@better-auth/utils@0.5.0)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.4.3))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(@better-auth/utils@0.5.0)(drizzle-orm@1.0.0-rc.4(@types/pg@8.23.1)(pg@8.23.0)(zod@4.4.3))
+      '@internationalized/date':
+        specifier: ^3.12.3
+        version: 3.12.3
       '@nuxt/ui':
         specifier: ^4.11.0
         version: 4.11.0(26fcbbe7005d5b1349aa0a2ccb2b587d)
