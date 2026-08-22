@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:18
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: WxMNFw4jWWGZoHkZwLoneuBJqAbGSPUC9hAH1GXUxXg0YCludsnceTg7BuIcmxGx
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql
+
+volumes:
+  db_data:
