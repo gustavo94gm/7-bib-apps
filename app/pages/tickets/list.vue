@@ -165,6 +165,41 @@ async function removeAssignee(userId: string) {
 
 const newComment = ref('')
 const addingComment = ref(false)
+const changingStatus = ref(false)
+
+const statusOptions = [
+  { label: 'Aberto', value: 'open' },
+  { label: 'Em Andamento', value: 'in_progress' },
+  { label: 'Fechado', value: 'closed' },
+]
+
+async function updateStatus(newStatus: string) {
+  if (!selectedTicket.value || newStatus === selectedTicket.value.status) return
+  changingStatus.value = true
+  try {
+    const result = await $fetch(`/api/tickets/${selectedTicket.value.id}` as string, {
+      method: 'PATCH',
+      body: { status: newStatus },
+    }) as { id: number; status: string | null; closedAt: string | null; updatedAt: string | null }
+    selectedTicket.value.status = result.status
+    selectedTicket.value.closedAt = result.closedAt
+    selectedTicket.value.updatedAt = result.updatedAt
+    const ticket = allTickets.value?.find(t => t.id === result.id)
+    if (ticket) {
+      ticket.status = result.status
+      ticket.closedAt = result.closedAt
+      ticket.updatedAt = result.updatedAt
+    }
+    if (result.status && TAB_STATUSES.includes(result.status as TabStatus)) {
+      activeTabIndex.value = result.status as TabStatus
+    }
+    toast.add({ title: 'Status atualizado!', color: 'success' })
+  } catch {
+    toast.add({ title: 'Erro ao atualizar status.', color: 'error' })
+  } finally {
+    changingStatus.value = false
+  }
+}
 
 async function addComment() {
   if (!selectedTicket.value || !newComment.value.trim()) return
@@ -303,13 +338,14 @@ async function addComment() {
                 <div class="space-y-1 flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="font-mono text-xs text-muted">#{{ selectedTicket.id }}</span>
-                    <UBadge
-                      :color="statusBadgeColor(selectedTicket.status)"
-                      variant="subtle"
-                      size="sm"
-                    >
-                      {{ statusLabel(selectedTicket.status) }}
-                    </UBadge>
+                    <USelect
+                      :model-value="selectedTicket.status ?? 'open'"
+                      :items="statusOptions"
+                      :loading="changingStatus"
+                      size="xs"
+                      class="w-36"
+                      @update:model-value="updateStatus"
+                    />
                   </div>
                   <h2 class="text-xl font-semibold text-highlighted leading-tight">
                     {{ selectedTicket.title }}
