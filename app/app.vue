@@ -5,49 +5,6 @@ const open = useCookie("sidebar-open", { default: () => true });
 
 const colorMode = useColorMode();
 
-const teams = ref([
-  {
-    label: "Nuxt",
-    avatar: {
-      src: "https://github.com/nuxt.png",
-      alt: "Nuxt",
-    },
-  },
-  {
-    label: "Vue",
-    avatar: {
-      src: "https://github.com/vuejs.png",
-      alt: "Vue",
-    },
-  },
-  {
-    label: "UnJS",
-    avatar: {
-      src: "https://github.com/unjs.png",
-      alt: "UnJS",
-    },
-  },
-]);
-const selectedTeam = ref(teams.value[0]);
-
-const teamsItems = computed<DropdownMenuItem[][]>(() => {
-  return [
-    teams.value.map((team, index) => ({
-      ...team,
-      kbds: ["meta", String(index + 1)],
-      onSelect() {
-        selectedTeam.value = team;
-      },
-    })),
-    [
-      {
-        label: "Create team",
-        icon: "i-lucide-circle-plus",
-      },
-    ],
-  ];
-});
-
 function getItems(state: "collapsed" | "expanded") {
   return [
     {
@@ -60,11 +17,13 @@ function getItems(state: "collapsed" | "expanded") {
               {
                 label: "Criar Chamado",
                 icon: "i-lucide-plus",
+                to: "/tickets/new",
               },
               {
                 label: "Lista de Chamados",
                 icon: "i-lucide-list",
-              }
+                to: "/tickets/list",
+              },
             ]
           : [],
     },
@@ -77,18 +36,21 @@ function getItems(state: "collapsed" | "expanded") {
               {
                 label: "Gerar Relatórios",
                 icon: "i-lucide-chart-line",
+                to: "/admin/reports",
               },
               {
                 label: "Gerenciar usuários",
                 icon: "i-lucide-users",
+                to: "/admin/users",
               },
               {
                 label: "Banco de dados",
                 icon: "i-lucide-table",
+                to: "/admin/database",
               },
             ]
           : [],
-    }
+    },
   ] satisfies NavigationMenuItem[];
 }
 
@@ -144,15 +106,13 @@ const userItems = computed<DropdownMenuItem[][]>(() => [
     },
   ],
 ]);
-
-defineShortcuts(extractShortcuts(teamsItems.value));
 </script>
 
 <template>
   <div class="flex flex-1">
     <USidebar v-model:open="open" collapsible="offcanvas" rail>
       <template #header>
-        <img src="./assets/logo7bib.jpg" class="w-11 rounded-2xl" />
+        <img src="./assets/logo7bib.jpg" class="w-10 rounded-2xl" />
         <p>Desenvolvido por Sd Ev Gustavo Mueller</p>
       </template>
 
@@ -200,8 +160,8 @@ defineShortcuts(extractShortcuts(teamsItems.value));
         />
       </div>
 
-      <div class="flex-1 p-4">
-        <Placeholder class="size-full" />
+      <div class="flex-1 py-10 px-10">
+        <NuxtPage />
       </div>
     </div>
   </div>
