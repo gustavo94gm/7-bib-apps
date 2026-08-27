@@ -1,4 +1,4 @@
-import { pgTable, bigserial, bigint, varchar, text, timestamp, primaryKey, unique } from "drizzle-orm/pg-core"
+import { pgTable, bigserial, bigint, varchar, text, timestamp, date, time, primaryKey, unique } from "drizzle-orm/pg-core"
 import { user } from "./auth-schema"
 
 export const categories = pgTable("categories", {
@@ -37,6 +37,18 @@ export const ticketAssignees = pgTable("ticket_assignees", {
 }, (table) => [
 	primaryKey({ columns: [table.ticketId, table.userId], name: "ticket_assignees_pkey"}),
 ]);
+
+export const visitorLogs = pgTable("visitor_logs", {
+	id: bigserial({ mode: 'number' }).primaryKey(),
+	cpf: varchar({ length: 20 }),
+	name: text(),
+	badgeNumber: varchar("badge_number", { length: 50 }),
+	destination: text(),
+	visitDate: date("visit_date"),
+	entryTime: time("entry_time"),
+	exitTime: time("exit_time"),
+	createdAt: timestamp("created_at", { withTimezone: true }),
+});
 
 export const tickets = pgTable("tickets", {
 	id: bigserial({ mode: 'number' }).primaryKey(),
