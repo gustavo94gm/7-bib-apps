@@ -40,6 +40,30 @@ function getItems(state: "collapsed" | "expanded") {
           : [],
     },
     {
+      label: "Visitantes",
+      icon: "i-lucide-id-card",
+      children:
+        state === "expanded"
+          ? [
+              {
+                label: "Início",
+                icon: "i-lucide-home",
+                to: "/visitor",
+              },
+              {
+                label: "Controle de Visitantes",
+                icon: "i-lucide-clipboard-list",
+                to: "/visitor/control",
+              },
+              {
+                label: "Relatórios",
+                icon: "i-lucide-bar-chart-2",
+                to: "/visitor/reports",
+              },
+            ]
+          : [],
+    },
+    {
       label: "Administração",
       icon: "i-lucide-settings",
       children:
