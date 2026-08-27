@@ -1,0 +1,156 @@
+<script setup lang="ts">
+useSeoMeta({
+  title: 'Relatórios de Visitantes',
+  description: 'Filtre visitas por CPF, crachá e período.',
+})
+
+interface VisitorLog {
+  id: number
+  cpf: string | null
+  name: string | null
+  badgeNumber: string | null
+  destination: string | null
+  visitDate: string | null
+  entryTime: string | null
+  exitTime: string | null
+}
+
+const filterCpf = ref('')
+const filterBadgeNumber = ref('')
+const filterDateFrom = ref('')
+const filterDateTo = ref('')
+
+const loading = ref(false)
+const hasSearched = ref(false)
+const results = ref<VisitorLog[]>([])
+
+async function runReport() {
+  loading.value = true
+  hasSearched.value = true
+  try {
+    const params: Record<string, string> = {}
+    if (filterCpf.value.trim()) params.cpf = filterCpf.value.trim()
+    if (filterBadgeNumber.value.trim()) params.badgeNumber = filterBadgeNumber.value.trim()
+    if (filterDateFrom.value) params.dateFrom = filterDateFrom.value
+    if (filterDateTo.value) params.dateTo = filterDateTo.value
+
+    results.value = await $fetch<VisitorLog[]>('/api/reports/visitors', { params })
+  } finally {
+    loading.value = false
+  }
+}
+
+function clearFilters() {
+  filterCpf.value = ''
+  filterBadgeNumber.value = ''
+  filterDateFrom.value = ''
+  filterDateTo.value = ''
+  results.value = []
+  hasSearched.value = false
+}
+
+function formatDate(d: string | null) {
+  if (!d) return '—'
+  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(`${d}T00:00:00`))
+}
+
+const columns = [
+  { id: 'name', header: 'Nome' },
+  { id: 'cpf', header: 'CPF' },
+  { id: 'badgeNumber', header: 'Crachá' },
+  { id: 'destination', header: 'Destino' },
+  { id: 'visitDate', header: 'Data' },
+  { id: 'entryTime', header: 'Entrada' },
+  { id: 'exitTime', header: 'Saída' },
+]
+</script>
+
+<template>
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-highlighted">Relatórios de Visitantes</h1>
+      <p class="text-sm text-muted mt-1">Filtre e consulte o histórico de visitas.</p>
+    </div>
+
+    <UCard>
+      <template #header>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-lucide-filter" class="text-muted" />
+          <span class="font-semibold text-sm">Filtros</span>
+        </div>
+      </template>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <UFormField label="CPF">
+          <UInput v-model="filterCpf" icon="i-lucide-id-card" placeholder="000.000.000-00" class="w-full" />
+        </UFormField>
+
+        <UFormField label="Nº Crachá">
+          <UInput v-model="filterBadgeNumber" icon="i-lucide-badge" placeholder="Buscar por crachá..." class="w-full" />
+        </UFormField>
+
+        <UFormField label="Data inicial">
+          <UInput v-model="filterDateFrom" type="date" class="w-full" />
+        </UFormField>
+
+        <UFormField label="Data final">
+          <UInput v-model="filterDateTo" type="date" class="w-full" />
+        </UFormField>
+      </div>
+
+      <template #footer>
+        <div class="flex items-center justify-end gap-2">
+          <UButton variant="ghost" color="neutral" label="Limpar" icon="i-lucide-x" @click="clearFilters" />
+          <UButton label="Buscar" icon="i-lucide-search" :loading="loading" @click="runReport" />
+        </div>
+      </template>
+    </UCard>
+
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <div class="flex flex-col items-center gap-3 text-muted">
+        <UIcon name="i-lucide-loader-circle" class="animate-spin text-4xl" />
+        <p class="text-sm">Buscando...</p>
+      </div>
+    </div>
+
+    <div
+      v-else-if="!hasSearched"
+      class="flex flex-col items-center justify-center py-20 text-center text-muted"
+    >
+      <UIcon name="i-lucide-bar-chart-2" class="text-5xl mb-3 opacity-30" />
+      <p class="text-sm">Configure os filtros acima e clique em <strong>Buscar</strong>.</p>
+    </div>
+
+    <div
+      v-else-if="results.length === 0"
+      class="flex flex-col items-center justify-center py-20 text-center text-muted"
+    >
+      <UIcon name="i-lucide-inbox" class="text-5xl mb-3 opacity-30" />
+      <p class="text-sm">Nenhuma visita encontrada com os filtros selecionados.</p>
+    </div>
+
+    <UCard v-else :ui="{ body: 'p-0' }">
+      <template #header>
+        <span class="font-semibold text-sm">Resultados ({{ results.length }})</span>
+      </template>
+      <UTable
+        :data="results"
+        :columns="columns"
+        :ui="{
+          thead: 'bg-elevated/50',
+          th: 'font-semibold text-xs uppercase tracking-wider text-muted py-3',
+        }"
+      >
+        <template #visitDate-cell="{ row }">
+          <span class="text-sm text-muted">{{ formatDate(row.original.visitDate) }}</span>
+        </template>
+        <template #exitTime-cell="{ row }">
+          <UBadge v-if="!row.original.exitTime" color="warning" variant="subtle" size="sm">
+            Em andamento
+          </UBadge>
+          <span v-else class="text-sm">{{ row.original.exitTime }}</span>
+        </template>
+      </UTable>
+    </UCard>
+  </div>
+</template>
