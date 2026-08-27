@@ -53,6 +53,10 @@ function formatDate(d: string | null) {
   return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(`${d}T00:00:00`))
 }
 
+function formatTime(t: string | null) {
+  return t ? t.slice(0, 5) : '—'
+}
+
 const columns = [
   { id: 'name', header: 'Nome' },
   { id: 'cpf', header: 'CPF' },
@@ -85,20 +89,29 @@ const columns = [
           th: 'font-semibold text-xs uppercase tracking-wider text-muted py-3',
         }"
       >
+        <template #name-cell="{ row }">
+          <span class="text-sm font-medium text-highlighted">{{ row.original.name ?? '—' }}</span>
+        </template>
         <template #cpf-cell="{ row }">
           <span class="text-sm">{{ row.original.cpf ?? '—' }}</span>
+        </template>
+        <template #badgeNumber-cell="{ row }">
+          <span class="text-sm">{{ row.original.badgeNumber ?? '—' }}</span>
+        </template>
+        <template #destination-cell="{ row }">
+          <span class="text-sm">{{ row.original.destination ?? '—' }}</span>
         </template>
         <template #visitDate-cell="{ row }">
           <span class="text-sm text-muted">{{ formatDate(row.original.visitDate) }}</span>
         </template>
         <template #entryTime-cell="{ row }">
-          <span class="text-sm">{{ row.original.entryTime ?? '—' }}</span>
+          <span class="text-sm">{{ formatTime(row.original.entryTime) }}</span>
         </template>
         <template #exitTime-cell="{ row }">
           <UBadge v-if="!row.original.exitTime" color="warning" variant="subtle" size="sm">
             Em andamento
           </UBadge>
-          <span v-else class="text-sm">{{ row.original.exitTime }}</span>
+          <span v-else class="text-sm">{{ formatTime(row.original.exitTime) }}</span>
         </template>
         <template #actions-cell="{ row }">
           <UButton
