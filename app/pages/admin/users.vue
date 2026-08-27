@@ -97,17 +97,19 @@ function formatDate(d: string | null) {
 
 function roleBadgeColor(role: string | null) {
   if (role === "admin") return "primary";
+  if (role === "rp") return "secondary";
   return "neutral";
 }
 
 function roleLabel(role: string | null) {
   if (role === "admin") return "Admin";
+  if (role === "rp") return "RP";
   return "Usuário";
 }
 
 const actionLoading = ref<string | null>(null);
 
-async function setRole(userId: string, role: "admin" | "user") {
+async function setRole(userId: string, role: "admin" | "user" | "rp") {
   actionLoading.value = userId;
   try {
     const { error } = await (authClient as any).admin.setRole({
@@ -180,8 +182,14 @@ function getRowActions(row: SystemUser): any[][] {
       {
         label: "Tornar Usuário",
         icon: "i-lucide-user",
-        disabled: row.role !== "admin" || row.id === session.value?.user?.id,
+        disabled: row.role === "user" || row.id === session.value?.user?.id,
         onSelect: () => setRole(row.id, "user"),
+      },
+      {
+        label: "Tornar RP",
+        icon: "i-lucide-id-card",
+        disabled: row.role === "rp" || row.id === session.value?.user?.id,
+        onSelect: () => setRole(row.id, "rp"),
       },
     ],
     [
@@ -207,7 +215,7 @@ const createForm = reactive({
   name: "",
   email: "",
   password: "",
-  role: "user" as "admin" | "user",
+  role: "user" as "admin" | "user" | "rp",
 });
 const createLoading = ref(false);
 
@@ -235,6 +243,7 @@ async function createUser() {
 const roleOptions = [
   { label: "Usuário", value: "user" },
   { label: "Admin", value: "admin" },
+  { label: "RP", value: "rp" },
 ];
 </script>
 

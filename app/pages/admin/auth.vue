@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { signIn, useSession } from "~~/lib/auth-client";
+import { signIn, useSession } from '~~/lib/auth-client';
 
 definePageMeta({
-  layout: "blank",
+  layout: 'blank',
 });
 
 useSeoMeta({
-  title: "Acesso Administrativo",
-  description: "Faça login para acessar o painel de administração.",
+  title: 'Acesso Administrativo',
+  description: 'Faça login para acessar o painel de administração.',
 });
 
 const router = useRouter();
+const route = useRoute();
 
 const sessionState = useSession();
 const session = computed(() => sessionState.value?.data ?? null);
@@ -19,24 +20,26 @@ onMounted(() => {
   watch(
     session,
     (s) => {
-      if (s?.user && (s.user as any).role === "admin") {
-        router.replace("/tickets/list");
-      }
+      if (!s?.user) return;
+      const redirect = route.query.redirect as string | undefined;
+      const target =
+        redirect || ((s.user as any).role === 'admin' ? '/' : null);
+      if (target) router.replace(target);
     },
-    { immediate: true }
+    { immediate: true },
   );
 });
 
 const form = reactive({
-  email: "",
-  password: "",
+  email: '',
+  password: '',
 });
 
 const loading = ref(false);
-const errorMsg = ref("");
+const errorMsg = ref('');
 
 async function handleLogin() {
-  errorMsg.value = "";
+  errorMsg.value = '';
   loading.value = true;
   try {
     const { error } = await signIn.email({
@@ -45,13 +48,13 @@ async function handleLogin() {
     });
 
     if (error) {
-      errorMsg.value = "Email ou senha inválidos.";
+      errorMsg.value = 'Email ou senha inválidos.';
       return;
     }
 
-    await router.push("/tickets/new");
+    await router.push((route.query.redirect as string) || '/tickets/new');
   } catch {
-    errorMsg.value = "Erro ao fazer login. Tente novamente.";
+    errorMsg.value = 'Erro ao fazer login. Tente novamente.';
   } finally {
     loading.value = false;
   }
@@ -96,7 +99,11 @@ async function handleLogin() {
             variant="subtle"
             icon="i-lucide-circle-x"
             :description="errorMsg"
-            :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
+            :close-button="{
+              icon: 'i-lucide-x',
+              color: 'error',
+              variant: 'link',
+            }"
             @close="errorMsg = ''"
           />
 
