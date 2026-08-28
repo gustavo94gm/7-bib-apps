@@ -1,5 +1,12 @@
-import { pgTable, bigserial, bigint, varchar, text, timestamp, date, time, primaryKey, unique } from "drizzle-orm/pg-core"
+import { pgTable, pgEnum, bigserial, bigint, varchar, text, timestamp, date, time, primaryKey, unique } from "drizzle-orm/pg-core"
 import { user } from "./auth-schema"
+
+export const visitorSituationEnum = pgEnum("visitor_situation", [
+	"civil",
+	"inativo_pensionista",
+	"militar_outra_om",
+	"militar_reserva",
+])
 
 export const categories = pgTable("categories", {
 	id: bigserial({ mode: 'number' }).primaryKey(),
@@ -44,6 +51,7 @@ export const visitorLogs = pgTable("visitor_logs", {
 	name: text(),
 	badgeNumber: varchar("badge_number", { length: 50 }),
 	destination: text(),
+	situation: visitorSituationEnum("situation"),
 	visitDate: date("visit_date"),
 	entryTime: time("entry_time"),
 	exitTime: time("exit_time"),
