@@ -24,6 +24,12 @@ const displayUser = computed(() => ({
 function getItems(state: 'collapsed' | 'expanded') {
   const items: NavigationMenuItem[] = [];
 
+  items.push({
+    label: 'Início',
+    icon: 'i-lucide-home',
+    to: '/',
+  });
+
   const ticketChildren = [
     {
       label: 'Criar Chamado',
