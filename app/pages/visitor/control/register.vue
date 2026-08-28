@@ -16,9 +16,17 @@ const form = reactive({
   visitDate: today,
   badgeNumber: '',
   destination: '',
+  situation: '',
   entryTime: now,
   exitTime: '',
 });
+
+const situationOptions = [
+  { label: 'Civil', value: 'civil' },
+  { label: 'Inativo/Pensionista', value: 'inativo_pensionista' },
+  { label: 'Militar de outra OM', value: 'militar_outra_om' },
+  { label: 'Militar da reserva', value: 'militar_reserva' },
+];
 
 function formatCpf(value: string) {
   const digits = value.replace(/\D/g, '').slice(0, 11);
@@ -122,14 +130,26 @@ async function submit() {
           </UFormField>
         </div>
 
-        <UFormField label="Destino" required>
-          <UInput
-            v-model="form.destination"
-            placeholder="Setor ou pessoa a ser visitada"
-            required
-            class="w-full"
-          />
-        </UFormField>
+        <div class="grid grid-cols-2 gap-4">
+          <UFormField label="Destino" required>
+            <UInput
+              v-model="form.destination"
+              placeholder="Setor ou pessoa a ser visitada"
+              required
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField label="Situação" required>
+            <USelect
+              v-model="form.situation"
+              :items="situationOptions"
+              placeholder="Selecione a situação"
+              required
+              class="w-full"
+            />
+          </UFormField>
+        </div>
 
         <div class="grid grid-cols-2 gap-4">
           <UFormField label="Hora de entrada" required>

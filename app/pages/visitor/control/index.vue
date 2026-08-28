@@ -10,6 +10,7 @@ interface VisitorLog {
   name: string | null
   badgeNumber: string | null
   destination: string | null
+  situation: string | null
   visitDate: string | null
   entryTime: string | null
   exitTime: string | null
@@ -57,11 +58,23 @@ function formatTime(t: string | null) {
   return t ? t.slice(0, 5) : '—'
 }
 
+const SITUATION_LABELS: Record<string, string> = {
+  civil: 'Civil',
+  inativo_pensionista: 'Inativo/Pensionista',
+  militar_outra_om: 'Militar de outra OM',
+  militar_reserva: 'Militar da reserva',
+}
+
+function formatSituation(s: string | null) {
+  return s ? (SITUATION_LABELS[s] ?? s) : '—'
+}
+
 const columns = [
   { id: 'name', header: 'Nome' },
   { id: 'cpf', header: 'CPF' },
   { id: 'badgeNumber', header: 'Crachá' },
   { id: 'destination', header: 'Destino' },
+  { id: 'situation', header: 'Situação' },
   { id: 'visitDate', header: 'Data' },
   { id: 'entryTime', header: 'Entrada' },
   { id: 'exitTime', header: 'Saída' },
@@ -100,6 +113,9 @@ const columns = [
         </template>
         <template #destination-cell="{ row }">
           <span class="text-sm">{{ row.original.destination ?? '—' }}</span>
+        </template>
+        <template #situation-cell="{ row }">
+          <span class="text-sm">{{ formatSituation(row.original.situation) }}</span>
         </template>
         <template #visitDate-cell="{ row }">
           <span class="text-sm text-muted">{{ formatDate(row.original.visitDate) }}</span>
