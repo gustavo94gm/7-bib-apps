@@ -29,7 +29,7 @@ const actions = [
     label: 'Acessar o sistema de visitantes',
     description: 'Acesso ao sistema de visitates do RP Avançado',
     icon: 'i-lucide-list',
-    to: '/visitor/control',
+    to: '/visitor/',
   },
 ];
 </script>

@@ -16,14 +16,19 @@ const route = useRoute();
 const sessionState = useSession();
 const session = computed(() => sessionState.value?.data ?? null);
 
+function defaultTargetForRole(role: string | undefined) {
+  if (role === 'admin') return '/tickets/list';
+  if (role === 'rp') return '/visitor';
+  return '/tickets/new';
+}
+
 onMounted(() => {
   watch(
     session,
     (s) => {
       if (!s?.user) return;
       const redirect = route.query.redirect as string | undefined;
-      const target =
-        redirect || ((s.user as any).role === 'admin' ? '/' : null);
+      const target = redirect || defaultTargetForRole((s.user as any).role);
       if (target) router.replace(target);
     },
     { immediate: true },
