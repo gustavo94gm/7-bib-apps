@@ -12,3 +12,7 @@ services:
       - BETTER_AUTH_URL=${BETTER_AUTH_URL}
     networks:
       - coolify
+
+networks:
+  coolify:
+    name: coolify
