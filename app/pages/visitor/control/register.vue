@@ -44,7 +44,17 @@ watch(
   },
 );
 
-const NAV_KEYS = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+const NAV_KEYS = [
+  'Backspace',
+  'Delete',
+  'Tab',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'ArrowDown',
+  'Home',
+  'End',
+];
 
 function blockNonDigits(event: KeyboardEvent) {
   if (event.ctrlKey || event.metaKey || event.altKey) return;
@@ -53,6 +63,16 @@ function blockNonDigits(event: KeyboardEvent) {
 }
 
 const cpfValid = computed(() => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(form.cpf));
+
+watch(cpfValid, async (valid) => {
+  if (!valid) return;
+  const visitor = await $fetch<{ name: string; situation: string } | null>(
+    `/api/visitors/by-cpf/${form.cpf}`,
+  ).catch(() => null);
+  if (!visitor) return;
+  form.name = visitor.name;
+  form.situation = visitor.situation;
+});
 
 const loading = ref(false);
 

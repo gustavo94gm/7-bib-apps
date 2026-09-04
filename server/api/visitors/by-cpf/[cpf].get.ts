@@ -1,0 +1,17 @@
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { visitorLogs } from '../../../db/schema';
+import { desc, eq } from 'drizzle-orm';
+
+export default defineEventHandler(async (event) => {
+  const db = drizzle(process.env.DATABASE_URL!);
+  const cpf = getRouterParam(event, 'cpf');
+
+  const [visitor] = await db
+    .select({ name: visitorLogs.name, situation: visitorLogs.situation })
+    .from(visitorLogs)
+    .where(eq(visitorLogs.cpf, cpf!))
+    .orderBy(desc(visitorLogs.createdAt))
+    .limit(1);
+
+  return visitor ?? null;
+});
