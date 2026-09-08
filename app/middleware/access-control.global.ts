@@ -1,4 +1,5 @@
 import { authClient } from '~~/lib/auth-client';
+import { canAccess } from '~~/lib/access';
 
 const PUBLIC_PATHS = ['/', '/tickets/new', '/admin/auth', '/access-denied'];
 
@@ -19,8 +20,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     );
   }
 
-  if (role === 'admin') return;
-  if (role === 'rp' && isVisitorPath(to.path)) return;
+  if (canAccess(role, isVisitorPath(to.path))) return;
 
   const required = isVisitorPath(to.path) ? 'rp' : 'admin';
   return navigateTo(

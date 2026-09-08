@@ -1,4 +1,5 @@
 import { auth } from '~~/lib/auth'
+import { canAccess } from '~~/lib/access'
 
 const PUBLIC_ROUTES = [
   { method: 'POST', path: '/api/tickets' },
@@ -25,8 +26,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Não autenticado' })
   }
 
-  if (role === 'admin') return
-  if (role === 'rp' && isVisitorPath(path)) return
+  if (canAccess(role, isVisitorPath(path))) return
 
   throw createError({ statusCode: 403, message: 'Sem permissão' })
 })
