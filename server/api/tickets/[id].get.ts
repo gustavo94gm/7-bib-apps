@@ -1,4 +1,4 @@
-import { drizzle } from "drizzle-orm/node-postgres";
+import { db } from '~~/server/index'
 import {
   tickets,
   categories,
@@ -11,7 +11,6 @@ import { user } from "../../db/auth-schema";
 import { eq } from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {
-  const db = drizzle(process.env.DATABASE_URL!);
   const id = Number(getRouterParam(event, "id"));
 
   if (isNaN(id)) {

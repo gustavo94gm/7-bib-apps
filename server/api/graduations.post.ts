@@ -1,4 +1,4 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
+import { db } from '~~/server/index'
 import { graduations } from '../db/schema'
 
 export default defineEventHandler(async (event) => {
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Abreviação é obrigatória.' })
   }
 
-  const db = drizzle(process.env.DATABASE_URL!)
+
   const [created] = await db.insert(graduations).values({
     abbreviation: abbreviation.trim(),
     createdAt: new Date(),

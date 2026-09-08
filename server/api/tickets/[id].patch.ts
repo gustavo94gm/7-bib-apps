@@ -1,4 +1,4 @@
-import { drizzle } from "drizzle-orm/node-postgres";
+import { db } from '~~/server/index'
 import { tickets } from "../../db/schema";
 import { eq } from "drizzle-orm";
 
@@ -6,7 +6,6 @@ const VALID_STATUSES = ["open", "in_progress", "closed"] as const;
 type TicketStatus = (typeof VALID_STATUSES)[number];
 
 export default defineEventHandler(async (event) => {
-  const db = drizzle(process.env.DATABASE_URL!);
   const id = Number(getRouterParam(event, "id"));
   const body = await readBody(event);
 

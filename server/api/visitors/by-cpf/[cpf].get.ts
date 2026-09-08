@@ -1,9 +1,8 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { db } from '~~/server/index'
 import { visitorLogs } from '../../../db/schema';
 import { desc, eq } from 'drizzle-orm';
 
 export default defineEventHandler(async (event) => {
-  const db = drizzle(process.env.DATABASE_URL!);
   const cpf = getRouterParam(event, 'cpf');
 
   const [visitor] = await db

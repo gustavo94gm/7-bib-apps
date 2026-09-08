@@ -1,10 +1,9 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
+import { db } from '~~/server/index'
 import { visitorLogs } from '../db/schema'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
-  const db = drizzle(process.env.DATABASE_URL!)
 
   const [visitor] = await db.insert(visitorLogs).values({
     cpf: body.cpf,

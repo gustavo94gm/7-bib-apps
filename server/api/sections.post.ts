@@ -1,4 +1,4 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
+import { db } from '~~/server/index'
 import { sections } from '../db/schema'
 
 export default defineEventHandler(async (event) => {
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Nome é obrigatório.' })
   }
 
-  const db = drizzle(process.env.DATABASE_URL!)
+
   const [created] = await db.insert(sections).values({
     name: name.trim(),
     createdAt: new Date(),

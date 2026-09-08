@@ -1,9 +1,8 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
+import { db } from '~~/server/index'
 import { ticketAssignees } from '../../../db/schema'
 import { eq, and } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const db = drizzle(process.env.DATABASE_URL!)
   const ticketId = Number(getRouterParam(event, 'id'))
   const query = getQuery(event)
   const userId = query.userId as string

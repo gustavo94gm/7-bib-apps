@@ -1,7 +1,6 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
+import { db } from '~~/server/index'
 import { sections } from '../db/schema'
 
 export default defineEventHandler(async () => {
-  const db = drizzle(process.env.DATABASE_URL!)
   return db.select().from(sections)
 })

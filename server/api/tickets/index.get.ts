@@ -1,9 +1,8 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
+import { db } from '~~/server/index'
 import { tickets, categories, graduations, sections } from '../../db/schema'
 import { eq, ilike, or, and } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const db = drizzle(process.env.DATABASE_URL!)
   const query = getQuery(event)
   const status = query.status as string | undefined
   const search = query.search as string | undefined
