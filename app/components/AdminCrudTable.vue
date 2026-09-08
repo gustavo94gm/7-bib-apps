@@ -57,17 +57,6 @@ const columns = computed(() => [
   { id: 'actions', header: '' },
 ]);
 
-function formatDate(d: string | null) {
-  if (!d) return '—';
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(d));
-}
-
 const isAddOpen = ref(false);
 const newValue = ref('');
 const adding = ref(false);
@@ -172,7 +161,7 @@ async function deleteItem() {
 
         <template #createdAt-cell="{ row }">
           <span class="text-sm text-muted">{{
-            formatDate(row.original.createdAt)
+            formatDateTime(row.original.createdAt)
           }}</span>
         </template>
 
@@ -183,6 +172,7 @@ async function deleteItem() {
               variant="ghost"
               color="error"
               size="sm"
+              aria-label="Remover"
               @click="
                 confirmDelete(
                   row.original.id,
@@ -230,6 +220,7 @@ async function deleteItem() {
                 variant="ghost"
                 color="neutral"
                 size="sm"
+                aria-label="Fechar"
                 @click="isAddOpen = false"
               />
             </div>

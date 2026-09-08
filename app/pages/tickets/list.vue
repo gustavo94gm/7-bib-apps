@@ -84,28 +84,6 @@ const columns = [
   { id: 'actions', header: 'Ações' },
 ]
 
-function formatDate(d: string | null) {
-  if (!d) return '—'
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  }).format(new Date(d))
-}
-
-function statusBadgeColor(status: string | null) {
-  if (status === 'open') return 'secondary'
-  if (status === 'in_progress') return 'warning'
-  if (status === 'closed') return 'primary'
-  return 'neutral'
-}
-
-function statusLabel(status: string | null) {
-  if (status === 'open') return 'Aberto'
-  if (status === 'in_progress') return 'Em Andamento'
-  if (status === 'closed') return 'Fechado'
-  return status ?? '—'
-}
-
 const isModalOpen = ref(false)
 const selectedTicket = ref<TicketDetail | null>(null)
 const loadingDetail = ref(false)
@@ -288,7 +266,7 @@ async function addComment() {
               </template>
 
               <template #createdAt-cell="{ row }">
-                <span class="text-sm text-muted">{{ formatDate(row.original.createdAt) }}</span>
+                <span class="text-sm text-muted">{{ formatDateTime(row.original.createdAt) }}</span>
               </template>
 
               <template #actions-cell="{ row }">
@@ -351,9 +329,9 @@ async function addComment() {
                     {{ selectedTicket.title }}
                   </h2>
                   <p class="text-xs text-muted">
-                    Aberto em {{ formatDate(selectedTicket.createdAt) }}
+                    Aberto em {{ formatDateTime(selectedTicket.createdAt) }}
                     <template v-if="selectedTicket.closedAt">
-                      · Fechado em {{ formatDate(selectedTicket.closedAt) }}
+                      · Fechado em {{ formatDateTime(selectedTicket.closedAt) }}
                     </template>
                   </p>
                 </div>
@@ -362,6 +340,7 @@ async function addComment() {
                   variant="ghost"
                   color="neutral"
                   size="sm"
+                  aria-label="Fechar"
                   @click="isModalOpen = false"
                 />
               </div>
@@ -418,6 +397,7 @@ async function addComment() {
                     <button
                       class="text-muted hover:text-error transition-colors ml-1"
                       title="Remover responsável"
+                      aria-label="Remover responsável"
                       @click="removeAssignee(assignee.userId)"
                     >
                       <UIcon name="i-lucide-x" class="text-xs" />
@@ -472,7 +452,7 @@ async function addComment() {
                     <div class="flex-1 bg-elevated/50 rounded-lg px-4 py-3 border border-default">
                       <div class="flex items-center justify-between mb-1">
                         <span class="text-sm font-semibold">{{ comment.authorName ?? 'Anônimo' }}</span>
-                        <span class="text-xs text-muted">{{ formatDate(comment.createdAt) }}</span>
+                        <span class="text-xs text-muted">{{ formatDateTime(comment.createdAt) }}</span>
                       </div>
                       <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ comment.content }}</p>
                     </div>

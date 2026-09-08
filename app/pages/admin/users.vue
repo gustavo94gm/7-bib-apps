@@ -86,15 +86,6 @@ const columns = [
   { id: "actions", header: "Ações" },
 ];
 
-function formatDate(d: string | null) {
-  if (!d) return "—";
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(d));
-}
-
 function roleBadgeColor(role: string | null) {
   if (role === "admin") return "primary";
   if (role === "rp") return "secondary";
@@ -486,6 +477,7 @@ const roleOptions = [
                 variant="ghost"
                 color="neutral"
                 size="sm"
+                aria-label="Fechar"
                 @click="isCreateModalOpen = false"
               />
             </div>

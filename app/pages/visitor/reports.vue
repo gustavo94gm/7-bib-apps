@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { shallowRef } from 'vue'
+import type { DateValue } from '@internationalized/date'
+
 useSeoMeta({
   title: 'Relatórios de Visitantes',
   description: 'Filtre visitas por CPF, crachá e período.',
@@ -18,8 +21,9 @@ interface VisitorLog {
 
 const filterCpf = ref('')
 const filterBadgeNumber = ref('')
-const filterDateFrom = ref('')
-const filterDateTo = ref('')
+
+type DateRange = { start: DateValue | undefined; end: DateValue | undefined }
+const dateRange = shallowRef<DateRange>({ start: undefined, end: undefined })
 
 const loading = ref(false)
 const hasSearched = ref(false)
@@ -32,8 +36,8 @@ async function runReport() {
     const params: Record<string, string> = {}
     if (filterCpf.value.trim()) params.cpf = filterCpf.value.trim()
     if (filterBadgeNumber.value.trim()) params.badgeNumber = filterBadgeNumber.value.trim()
-    if (filterDateFrom.value) params.dateFrom = filterDateFrom.value
-    if (filterDateTo.value) params.dateTo = filterDateTo.value
+    if (dateRange.value.start) params.dateFrom = dateValueToISO(dateRange.value.start)
+    if (dateRange.value.end) params.dateTo = dateValueToISO(dateRange.value.end)
 
     results.value = await $fetch<VisitorLog[]>('/api/reports/visitors', { params })
   } finally {
@@ -44,30 +48,9 @@ async function runReport() {
 function clearFilters() {
   filterCpf.value = ''
   filterBadgeNumber.value = ''
-  filterDateFrom.value = ''
-  filterDateTo.value = ''
+  dateRange.value = { start: undefined, end: undefined }
   results.value = []
   hasSearched.value = false
-}
-
-function formatDate(d: string | null) {
-  if (!d) return '—'
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(`${d}T00:00:00`))
-}
-
-function formatTime(t: string | null) {
-  return t ? t.slice(0, 5) : '—'
-}
-
-const SITUATION_LABELS: Record<string, string> = {
-  civil: 'Civil',
-  inativo_pensionista: 'Inativo/Pensionista',
-  militar_outra_om: 'Militar de outra OM',
-  militar_reserva: 'Militar da reserva',
-}
-
-function formatSituation(s: string | null) {
-  return s ? (SITUATION_LABELS[s] ?? s) : '—'
 }
 
 const columns = [
@@ -106,13 +89,7 @@ const columns = [
           <UInput v-model="filterBadgeNumber" icon="i-lucide-badge" placeholder="Buscar por crachá..." class="w-full" />
         </UFormField>
 
-        <UFormField label="Data inicial">
-          <UInput v-model="filterDateFrom" type="date" class="w-full" />
-        </UFormField>
-
-        <UFormField label="Data final">
-          <UInput v-model="filterDateTo" type="date" class="w-full" />
-        </UFormField>
+        <DateRangeField v-model="dateRange" class="lg:col-span-2" />
       </div>
 
       <template #footer>
@@ -174,7 +151,7 @@ const columns = [
           <span class="text-sm">{{ formatSituation(row.original.situation) }}</span>
         </template>
         <template #visitDate-cell="{ row }">
-          <span class="text-sm text-muted">{{ formatDate(row.original.visitDate) }}</span>
+          <span class="text-sm text-muted">{{ formatDateOnly(row.original.visitDate) }}</span>
         </template>
         <template #entryTime-cell="{ row }">
           <span class="text-sm">{{ formatTime(row.original.entryTime) }}</span>

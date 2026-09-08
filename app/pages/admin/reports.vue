@@ -6,10 +6,6 @@ useSeoMeta({
   description: 'Gere relatórios filtrados de chamados com estatísticas de desempenho.',
 })
 
-interface Category { id: number; name: string | null }
-interface Graduation { id: number; abbreviation: string | null }
-interface Section { id: number; name: string | null }
-
 interface ReportTicket {
   id: number
   title: string | null
@@ -33,9 +29,7 @@ interface ReportResult {
   tickets: ReportTicket[]
 }
 
-const { data: categories } = await useFetch<Category[]>('/api/categories')
-const { data: graduations } = await useFetch<Graduation[]>('/api/graduations')
-const { data: sections } = await useFetch<Section[]>('/api/sections')
+const { categories, graduations, sections } = await useLookups()
 
 const filterStatus = ref<string | undefined>(undefined)
 const filterCategoryId = ref<number | undefined>(undefined)
@@ -45,16 +39,6 @@ const filterRequester = ref('')
 
 type DateRange = { start: DateValue | undefined; end: DateValue | undefined }
 const dateRange = shallowRef<DateRange>({ start: undefined, end: undefined })
-const isCalendarOpen = ref(false)
-
-const dateRangeLabel = computed(() => {
-  const { start, end } = dateRange.value
-  if (!start && !end) return 'Selecionar período'
-  const fmt = (d: DateValue) => `${String(d.day).padStart(2, '0')}/${String(d.month).padStart(2, '0')}/${d.year}`
-  if (start && end) return `${fmt(start)} – ${fmt(end)}`
-  if (start) return `A partir de ${fmt(start)}`
-  return 'Período selecionado'
-})
 
 const loading = ref(false)
 const reportData = ref<ReportResult | null>(null)
@@ -92,17 +76,10 @@ async function runReport() {
     if (filterSectionId.value) params.sectionId = String(filterSectionId.value)
     if (filterGraduationId.value) params.graduationId = String(filterGraduationId.value)
     if (filterRequester.value.trim()) params.requester = filterRequester.value.trim()
-    if (dateRange.value.start) {
-      const s = dateRange.value.start
-      params.dateFrom = `${s.year}-${String(s.month).padStart(2, '0')}-${String(s.day).padStart(2, '0')}`
-    }
-    if (dateRange.value.end) {
-      const e = dateRange.value.end
-      params.dateTo = `${e.year}-${String(e.month).padStart(2, '0')}-${String(e.day).padStart(2, '0')}`
-    }
+    if (dateRange.value.start) params.dateFrom = dateValueToISO(dateRange.value.start)
+    if (dateRange.value.end) params.dateTo = dateValueToISO(dateRange.value.end)
 
     reportData.value = await $fetch<ReportResult>('/api/reports/tickets' as string, { params })
-    isCalendarOpen.value = false
   } finally {
     loading.value = false
   }
@@ -117,13 +94,6 @@ function clearFilters() {
   dateRange.value = { start: undefined, end: undefined }
   reportData.value = null
   hasSearched.value = false
-}
-
-function formatDate(d: string | null) {
-  if (!d) return '—'
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-  }).format(new Date(d))
 }
 
 function statusLabel(s: string | null) {
@@ -219,87 +189,52 @@ function exportCSV() {
       </template>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
-          <label class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Status</label>
+        <UFormField label="Status">
           <USelect
             v-model="filterStatus"
             :items="statusOptions"
             placeholder="Todos os status"
+            class="w-full"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Solicitante</label>
+        <UFormField label="Solicitante">
           <UInput
             v-model="filterRequester"
             icon="i-lucide-user"
             placeholder="Buscar por nome..."
+            class="w-full"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Graduação</label>
+        <UFormField label="Graduação">
           <USelect
             v-model="filterGraduationId"
             :items="graduationOptions"
             placeholder="Todas as graduações"
+            class="w-full"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Categoria</label>
+        <UFormField label="Categoria">
           <USelect
             v-model="filterCategoryId"
             :items="categoryOptions"
             placeholder="Todas as categorias"
+            class="w-full"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Seção</label>
+        <UFormField label="Seção">
           <USelect
             v-model="filterSectionId"
             :items="sectionOptions"
             placeholder="Todas as seções"
+            class="w-full"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label class="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Período</label>
-          <UPopover v-model:open="isCalendarOpen">
-            <UButton
-              icon="i-lucide-calendar"
-              variant="outline"
-              color="neutral"
-              class="w-full justify-start font-normal"
-              :label="dateRangeLabel"
-            />
-            <template #content>
-              <div class="p-3 space-y-3">
-                <UCalendar
-                  v-model="dateRange"
-                  range
-                  :number-of-months="2"
-                />
-                <div class="flex justify-end gap-2 border-t border-default pt-3">
-                  <UButton
-                    size="xs"
-                    variant="ghost"
-                    color="neutral"
-                    label="Limpar"
-                    @click="dateRange = { start: undefined, end: undefined }"
-                  />
-                  <UButton
-                    size="xs"
-                    label="Aplicar"
-                    :disabled="!dateRange.start"
-                    @click="isCalendarOpen = false"
-                  />
-                </div>
-              </div>
-            </template>
-          </UPopover>
-        </div>
+        <DateRangeField v-model="dateRange" />
       </div>
 
       <template #footer>

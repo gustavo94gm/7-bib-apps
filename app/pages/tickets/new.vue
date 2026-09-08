@@ -4,9 +4,7 @@ useSeoMeta({
   description: 'Abra um novo chamado de suporte.',
 })
 
-const { data: categories } = await useFetch('/api/categories')
-const { data: graduations } = await useFetch('/api/graduations')
-const { data: sections } = await useFetch('/api/sections')
+const { categories, graduations, sections } = await useLookups()
 
 const toast = useToast()
 const router = useRouter()

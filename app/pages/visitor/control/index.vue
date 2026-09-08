@@ -49,26 +49,6 @@ async function registerExit(id: number) {
   }
 }
 
-function formatDate(d: string | null) {
-  if (!d) return '—'
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(`${d}T00:00:00`))
-}
-
-function formatTime(t: string | null) {
-  return t ? t.slice(0, 5) : '—'
-}
-
-const SITUATION_LABELS: Record<string, string> = {
-  civil: 'Civil',
-  inativo_pensionista: 'Inativo/Pensionista',
-  militar_outra_om: 'Militar de outra OM',
-  militar_reserva: 'Militar da reserva',
-}
-
-function formatSituation(s: string | null) {
-  return s ? (SITUATION_LABELS[s] ?? s) : '—'
-}
-
 const columns = [
   { id: 'name', header: 'Nome' },
   { id: 'cpf', header: 'CPF' },
@@ -118,7 +98,7 @@ const columns = [
           <span class="text-sm">{{ formatSituation(row.original.situation) }}</span>
         </template>
         <template #visitDate-cell="{ row }">
-          <span class="text-sm text-muted">{{ formatDate(row.original.visitDate) }}</span>
+          <span class="text-sm text-muted">{{ formatDateOnly(row.original.visitDate) }}</span>
         </template>
         <template #entryTime-cell="{ row }">
           <span class="text-sm">{{ formatTime(row.original.entryTime) }}</span>
