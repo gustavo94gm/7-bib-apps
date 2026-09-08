@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: WxMNFw4jWWGZoHkZwLoneuBJqAbGSPUC9hAH1GXUxXg0YCludsnceTg7BuIcmxGx
-      POSTGRES_DB: postgres
+      POSTGRES_DB: 7-bib-db
     volumes:
       - db_data:/var/lib/postgresql
 
