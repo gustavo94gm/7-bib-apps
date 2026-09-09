@@ -22,6 +22,9 @@ interface SystemUser {
   createdAt: string;
 }
 
+const role = computed(() => (session.value?.user as any)?.role as string | undefined);
+const canManageUsers = computed(() => role.value === "admin");
+
 const users = ref<SystemUser[]>([]);
 const loadingUsers = ref(true);
 const globalFilter = ref("");
@@ -32,20 +35,10 @@ const totalUsers = ref(0);
 async function fetchUsers() {
   loadingUsers.value = true;
   try {
-    const { data, error } = await (authClient as any).admin.listUsers({
-      query: {
-        limit: 9999,
-        offset: 0,
-      },
-    });
-
-    if (error) {
-      toast.add({ title: "Erro ao carregar usuários.", color: "error" });
-      return;
-    }
-
-    users.value = (data?.users ?? []) as SystemUser[];
+    users.value = await $fetch<SystemUser[]>("/api/users");
     totalUsers.value = users.value.length;
+  } catch {
+    toast.add({ title: "Erro ao carregar usuários.", color: "error" });
   } finally {
     loadingUsers.value = false;
   }
@@ -89,18 +82,20 @@ const columns = [
 function roleBadgeColor(role: string | null) {
   if (role === "admin") return "primary";
   if (role === "rp") return "secondary";
+  if (role === "infor") return "info";
   return "neutral";
 }
 
 function roleLabel(role: string | null) {
   if (role === "admin") return "Admin";
   if (role === "rp") return "RP";
-  return "Usuário";
+  if (role === "infor") return "Infor";
+  return "Sem role";
 }
 
 const actionLoading = ref<string | null>(null);
 
-async function setRole(userId: string, role: "admin" | "user" | "rp") {
+async function setRole(userId: string, role: "admin" | "rp" | "infor") {
   actionLoading.value = userId;
   try {
     const { error } = await (authClient as any).admin.setRole({
@@ -171,16 +166,16 @@ function getRowActions(row: SystemUser): any[][] {
         onSelect: () => setRole(row.id, "admin"),
       },
       {
-        label: "Tornar Usuário",
-        icon: "i-lucide-user",
-        disabled: row.role === "user" || row.id === session.value?.user?.id,
-        onSelect: () => setRole(row.id, "user"),
-      },
-      {
         label: "Tornar RP",
         icon: "i-lucide-id-card",
         disabled: row.role === "rp" || row.id === session.value?.user?.id,
         onSelect: () => setRole(row.id, "rp"),
+      },
+      {
+        label: "Tornar Infor",
+        icon: "i-lucide-info",
+        disabled: row.role === "infor" || row.id === session.value?.user?.id,
+        onSelect: () => setRole(row.id, "infor"),
       },
     ],
     [
@@ -206,7 +201,7 @@ const createForm = reactive({
   name: "",
   email: "",
   password: "",
-  role: "user" as "admin" | "user" | "rp",
+  role: "rp" as "admin" | "rp" | "infor",
 });
 const createLoading = ref(false);
 
@@ -222,7 +217,7 @@ async function createUser() {
     if (error) throw error;
     toast.add({ title: "Usuário criado com sucesso!", color: "success" });
     isCreateModalOpen.value = false;
-    Object.assign(createForm, { name: "", email: "", password: "", role: "user" });
+    Object.assign(createForm, { name: "", email: "", password: "", role: "rp" });
     await fetchUsers();
   } catch {
     toast.add({ title: "Erro ao criar usuário.", color: "error" });
@@ -232,9 +227,9 @@ async function createUser() {
 }
 
 const roleOptions = [
-  { label: "Usuário", value: "user" },
   { label: "Admin", value: "admin" },
   { label: "RP", value: "rp" },
+  { label: "Infor", value: "infor" },
 ];
 </script>
 
@@ -250,6 +245,7 @@ const roleOptions = [
         </p>
       </div>
       <UButton
+        v-if="canManageUsers"
         icon="i-lucide-user-plus"
         label="Novo Usuário"
         @click="isCreateModalOpen = true"
@@ -405,6 +401,7 @@ const roleOptions = [
 
           <template #actions-cell="{ row }">
             <UDropdownMenu
+              v-if="canManageUsers"
               :items="getRowActions(row.original)"
               :content="{ align: 'end' }"
             >
@@ -416,6 +413,7 @@ const roleOptions = [
                 :loading="actionLoading === row.original.id"
               />
             </UDropdownMenu>
+            <span v-else class="text-muted text-sm">—</span>
           </template>
         </UTable>
 

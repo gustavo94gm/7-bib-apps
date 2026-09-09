@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { authClient } from "~~/lib/auth-client";
+
 useSeoMeta({
   title: "Banco de Dados",
   description: "Visualize, adicione e remova entradas das tabelas do sistema.",
 });
+
+const { data: session } = await authClient.useSession(useFetch);
+const readOnly = computed(() => (session.value?.user as any)?.role !== "admin");
 
 const activeTab = ref("categories");
 
@@ -69,6 +74,7 @@ const tabs = [
         <AdminCrudTable
           ref="categoriesTable"
           resource="categories"
+          :read-only="readOnly"
           field="name"
           field-label="Nome"
           title="Categorias"
@@ -82,6 +88,7 @@ const tabs = [
         <AdminCrudTable
           ref="graduationsTable"
           resource="graduations"
+          :read-only="readOnly"
           field="abbreviation"
           field-label="Abreviação"
           title="Graduações"
@@ -96,6 +103,7 @@ const tabs = [
         <AdminCrudTable
           ref="sectionsTable"
           resource="sections"
+          :read-only="readOnly"
           field="name"
           field-label="Nome"
           title="Seções"

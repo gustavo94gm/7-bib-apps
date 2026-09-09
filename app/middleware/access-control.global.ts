@@ -24,6 +24,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const required = isVisitorPath(to.path) ? 'rp' : 'admin';
   return navigateTo(
-    `/access-denied?current=${encodeURIComponent(role ?? 'user')}&required=${required}`,
+    `/access-denied?current=${encodeURIComponent(role ?? '')}&required=${required}`,
   );
 });

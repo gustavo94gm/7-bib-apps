@@ -8,6 +8,11 @@ export default defineEventHandler(async () => {
       name: user.name,
       email: user.email,
       image: user.image,
+      role: user.role,
+      banned: user.banned,
+      banReason: user.banReason,
+      banExpires: user.banExpires,
+      createdAt: user.createdAt,
     })
     .from(user)
 

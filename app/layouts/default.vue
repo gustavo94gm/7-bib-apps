@@ -10,7 +10,7 @@ const router = useRouter();
 const { data: session } = await authClient.useSession(useFetch);
 
 const role = computed(() => (session.value?.user as any)?.role as string | undefined);
-const isAdmin = computed(() => role.value === 'admin');
+const isAdmin = computed(() => role.value === 'admin' || role.value === 'infor');
 const isRp = computed(() => role.value === 'rp' || isAdmin.value);
 
 const displayUser = computed(() => ({

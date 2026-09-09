@@ -9,7 +9,7 @@ const route = useRoute();
 const roleLabels: Record<string, string> = {
   admin: 'Admin',
   rp: 'RP',
-  user: 'Usuário',
+  infor: 'Infor',
 };
 
 function roleLabel(role: string | undefined) {

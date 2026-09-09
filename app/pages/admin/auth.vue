@@ -17,7 +17,7 @@ const sessionState = useSession();
 const session = computed(() => sessionState.value?.data ?? null);
 
 function defaultTargetForRole(role: string | undefined) {
-  if (role === 'admin') return '/tickets/list';
+  if (role === 'admin' || role === 'infor') return '/tickets/list';
   if (role === 'rp') return '/visitor';
   return '/tickets/new';
 }

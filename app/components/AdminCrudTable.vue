@@ -14,6 +14,7 @@ const props = defineProps<{
   placeholder: string;
   example: string;
   badge?: boolean;
+  readOnly?: boolean;
 }>();
 
 const toast = useToast();
@@ -127,6 +128,7 @@ async function deleteItem() {
         @click="fetchItems"
       />
       <UButton
+        v-if="!readOnly"
         icon="i-lucide-plus"
         label="Adicionar"
         @click="isAddOpen = true"
@@ -168,6 +170,7 @@ async function deleteItem() {
         <template #actions-cell="{ row }">
           <div class="flex justify-end">
             <UButton
+              v-if="!readOnly"
               icon="i-lucide-trash-2"
               variant="ghost"
               color="error"
