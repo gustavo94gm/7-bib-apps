@@ -1,4 +1,4 @@
-import { pgTable, pgEnum, bigserial, bigint, varchar, text, timestamp, date, time, primaryKey, unique } from "drizzle-orm/pg-core"
+import { pgTable, pgEnum, bigserial, bigint, varchar, text, timestamp, date, time, primaryKey, unique, integer, real, jsonb } from "drizzle-orm/pg-core"
 import { user } from "./auth-schema"
 
 export const visitorSituationEnum = pgEnum("visitor_situation", [
@@ -70,4 +70,28 @@ export const tickets = pgTable("tickets", {
 	createdAt: timestamp("created_at", { withTimezone: true }),
 	updatedAt: timestamp("updated_at", { withTimezone: true }),
 	closedAt: timestamp("closed_at", { withTimezone: true }),
+});
+
+export const machines = pgTable("machines", {
+	agentId: text("agent_id").primaryKey(),
+	hostname: varchar({ length: 255 }),
+	ip: varchar({ length: 45 }),
+	mac: varchar({ length: 32 }),
+	os: varchar({ length: 32 }),
+	osVersion: varchar("os_version", { length: 100 }),
+	arch: varchar({ length: 16 }),
+	cpuModel: varchar("cpu_model", { length: 255 }),
+	cpuCores: integer("cpu_cores"),
+	cpuUsagePercent: real("cpu_usage_percent"),
+	ramTotalMb: integer("ram_total_mb"),
+	ramUsedPercent: real("ram_used_percent"),
+	diskTotalGb: real("disk_total_gb"),
+	diskFreeGb: real("disk_free_gb"),
+	loggedInUser: varchar("logged_in_user", { length: 255 }),
+	uptimeSeconds: bigint("uptime_seconds", { mode: 'number' }),
+	networkAdapters: jsonb("network_adapters"),
+	gateway: varchar({ length: 45 }),
+	dns: jsonb(),
+	agentVersion: varchar("agent_version", { length: 32 }),
+	lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),
 });
