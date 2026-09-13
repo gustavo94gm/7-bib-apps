@@ -1,15 +1,13 @@
-FROM node:24-alpine AS build
+FROM oven/bun:1.4.2-alpine AS build
 WORKDIR /app
 
-RUN corepack enable
+COPY package.json bun.lock ./
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-RUN pnpm i
+RUN bun install
 
 COPY . ./
 
-RUN pnpm run build
+RUN bun run build
 
 FROM node:24-alpine
 WORKDIR /app
