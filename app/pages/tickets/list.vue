@@ -30,6 +30,7 @@ interface SystemUser {
   name: string
   email: string
   image: string | null
+  role: string | null
 }
 
 const { data: session } = await authClient.useSession(useFetch);
@@ -106,6 +107,7 @@ const toast = useToast()
 
 const assigneeUserOptions = computed(() =>
   (systemUsers.value ?? [])
+    .filter(u => u.role === 'admin' || u.role === 'infor')
     .filter(u => !selectedTicket.value?.assignees.some(a => a.userId === u.id))
     .map(u => ({ label: u.name, value: u.id }))
 )

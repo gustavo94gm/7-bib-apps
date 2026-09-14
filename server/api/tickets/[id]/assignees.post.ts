@@ -22,12 +22,17 @@ export default defineEventHandler(async (event) => {
       name: user.name,
       email: user.email,
       image: user.image,
+      role: user.role,
     })
     .from(user)
     .where(eq(user.id, userId));
 
   if (!existingUser) {
     throw createError({ statusCode: 404, message: "Usuário não encontrado" });
+  }
+
+  if (existingUser.role !== "admin" && existingUser.role !== "infor") {
+    throw createError({ statusCode: 400, message: "Usuário deve ter role Admin ou Infor" });
   }
 
   await db
