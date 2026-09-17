@@ -1,75 +1,64 @@
-# Nuxt Minimal Starter
+# 7ª BIB — Sistema de Gerenciamento de Chamados
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Sistema interno do 7º Batalhão de Infantaria Blindado (7º BIB) que reúne duas rotinas operacionais do batalhão em um só lugar:
+
+- **Chamados de TI**: abertura e acompanhamento de chamados de suporte técnico. Qualquer militar pode abrir um chamado sem precisar de login; o setor de TI (Admin/Infor) gerencia atribuição, status e comentários.
+- **Controle de visitantes (RP Avançado)**: registro de entrada e saída de visitantes no posto de guarda (nome, CPF, crachá, destino, situação, horário), com autopreenchimento por CPF já cadastrado e relatórios de consulta.
+
+## Stack
+
+- [Nuxt 4](https://nuxt.com/) + Vue 3 + [Nuxt UI](https://ui.nuxt.com/)
+- PostgreSQL + [Drizzle ORM](https://orm.drizzle.team/)
+- [better-auth](https://www.better-auth.com/) para autenticação (papéis `admin` e `rp`)
+- [Bun](https://bun.sh/) como runtime/gerenciador de pacotes
+
+## Usuários e acesso
+
+- **Requisitante**: qualquer militar do batalhão — abre chamado sem conta.
+- **RP Avançado**: acesso restrito às rotas `/visitor/*` (registro e relatório de visitantes).
+- **Admin**: acesso irrestrito — gerencia chamados, usuários, categorias, graduações, seções e relatórios.
 
 ## Setup
 
-Make sure to install dependencies:
+Requer um banco PostgreSQL rodando. Suba o banco de desenvolvimento com Docker:
 
 ```bash
-# npm
-npm install
+docker compose -f docker-compose.dev.yml up -d
+```
 
-# pnpm
-pnpm install
+Configure as variáveis de ambiente (copie `.env.example` para `.env` e preencha):
 
-# yarn
-yarn install
+```
+DATABASE_URL=
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=
+```
 
-# bun
+Instale as dependências:
+
+```bash
 bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+Aplique o schema no banco:
 
 ```bash
-# npm
-npm run dev
+bun run drizzle-kit push
+```
 
-# pnpm
-pnpm dev
+## Desenvolvimento
 
-# yarn
-yarn dev
-
-# bun
+```bash
 bun run dev
 ```
 
-## Production
+Servidor sobe em `http://localhost:3000`.
 
-Build the application for production:
+## Produção
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
 bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
 bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Também há `Dockerfile` e `docker-compose.yml` para deploy em produção.
