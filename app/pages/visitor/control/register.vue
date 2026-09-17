@@ -7,6 +7,8 @@ useSeoMeta({
 const toast = useToast();
 const router = useRouter();
 
+const { visitorSituations } = await useLookups();
+
 const today = new Date().toISOString().slice(0, 10);
 const now = new Date().toTimeString().slice(0, 5);
 
@@ -16,17 +18,14 @@ const form = reactive({
   visitDate: today,
   badgeNumber: '',
   destination: '',
-  situation: '',
+  situationId: null as number | null,
   entryTime: now,
   exitTime: '',
 });
 
-const situationOptions = [
-  { label: 'Civil', value: 'civil' },
-  { label: 'Inativo/Pensionista', value: 'inativo_pensionista' },
-  { label: 'Militar de outra OM', value: 'militar_outra_om' },
-  { label: 'Militar da reserva', value: 'militar_reserva' },
-];
+const situationOptions = computed(() =>
+  (visitorSituations.value ?? []).map((s: any) => ({ label: s.name, value: s.id })),
+);
 
 function formatCpf(value: string) {
   const digits = value.replace(/\D/g, '').slice(0, 11);
@@ -66,12 +65,12 @@ const cpfValid = computed(() => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(form.cpf));
 
 watch(cpfValid, async (valid) => {
   if (!valid) return;
-  const visitor = await $fetch<{ name: string; situation: string } | null>(
+  const visitor = await $fetch<{ name: string; situationId: number | null } | null>(
     `/api/visitors/by-cpf/${form.cpf}`,
   ).catch(() => null);
   if (!visitor) return;
   form.name = visitor.name;
-  form.situation = visitor.situation;
+  form.situationId = visitor.situationId;
 });
 
 const loading = ref(false);
@@ -162,7 +161,7 @@ async function submit() {
 
           <UFormField label="Situação" required>
             <USelect
-              v-model="form.situation"
+              v-model="form.situationId"
               :items="situationOptions"
               placeholder="Selecione a situação"
               required

@@ -1,24 +1,46 @@
 <script setup lang="ts">
-import { authClient } from "~~/lib/auth-client";
+import { authClient } from '~~/lib/auth-client';
 
 useSeoMeta({
-  title: "Banco de Dados",
-  description: "Visualize, adicione e remova entradas das tabelas do sistema.",
+  title: 'Banco de Dados',
+  description: 'Visualize, adicione e remova entradas das tabelas do sistema.',
 });
 
 const { data: session } = await authClient.useSession(useFetch);
-const readOnly = computed(() => (session.value?.user as any)?.role !== "admin");
+const readOnly = computed(() => (session.value?.user as any)?.role !== 'admin');
 
-const activeTab = ref("categories");
+const activeTab = ref('categories');
 
-const categoriesTable = useTemplateRef("categoriesTable");
-const graduationsTable = useTemplateRef("graduationsTable");
-const sectionsTable = useTemplateRef("sectionsTable");
+const categoriesTable = useTemplateRef('categoriesTable');
+const graduationsTable = useTemplateRef('graduationsTable');
+const sectionsTable = useTemplateRef('sectionsTable');
+const visitorSituationsTable = useTemplateRef('visitorSituationsTable');
 
 const tabs = [
-  { value: "categories", slot: "categories" as const, label: "Categorias", icon: "i-lucide-tag" },
-  { value: "graduations", slot: "graduations" as const, label: "Graduações", icon: "i-lucide-award" },
-  { value: "sections", slot: "sections" as const, label: "Seções", icon: "i-lucide-layers" },
+  {
+    value: 'categories',
+    slot: 'categories' as const,
+    label: 'Categorias',
+    icon: 'i-lucide-tag',
+  },
+  {
+    value: 'graduations',
+    slot: 'graduations' as const,
+    label: 'Graduações',
+    icon: 'i-lucide-award',
+  },
+  {
+    value: 'sections',
+    slot: 'sections' as const,
+    label: 'Seções',
+    icon: 'i-lucide-layers',
+  },
+  {
+    value: 'visitorSituations',
+    slot: 'visitorSituations' as const,
+    label: 'Situações de Visitante',
+    icon: 'i-lucide-user-check',
+  },
 ];
 </script>
 
@@ -33,7 +55,7 @@ const tabs = [
       </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-4 gap-4">
       <UCard :ui="{ body: 'p-4' }">
         <div class="flex items-center gap-3">
           <div class="p-2 rounded-lg bg-primary/10">
@@ -41,7 +63,9 @@ const tabs = [
           </div>
           <div>
             <p class="text-xs text-muted">Categorias</p>
-            <p class="text-2xl font-bold text-highlighted">{{ categoriesTable?.count ?? 0 }}</p>
+            <p class="text-2xl font-bold text-highlighted">
+              {{ categoriesTable?.count ?? 0 }}
+            </p>
           </div>
         </div>
       </UCard>
@@ -52,7 +76,9 @@ const tabs = [
           </div>
           <div>
             <p class="text-xs text-muted">Graduações</p>
-            <p class="text-2xl font-bold text-highlighted">{{ graduationsTable?.count ?? 0 }}</p>
+            <p class="text-2xl font-bold text-highlighted">
+              {{ graduationsTable?.count ?? 0 }}
+            </p>
           </div>
         </div>
       </UCard>
@@ -63,7 +89,22 @@ const tabs = [
           </div>
           <div>
             <p class="text-xs text-muted">Seções</p>
-            <p class="text-2xl font-bold text-highlighted">{{ sectionsTable?.count ?? 0 }}</p>
+            <p class="text-2xl font-bold text-highlighted">
+              {{ sectionsTable?.count ?? 0 }}
+            </p>
+          </div>
+        </div>
+      </UCard>
+      <UCard :ui="{ body: 'p-4' }">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-purple-500/10">
+            <UIcon name="i-lucide-user-check" class="text-purple-500 text-xl" />
+          </div>
+          <div>
+            <p class="text-xs text-muted">Situações</p>
+            <p class="text-2xl font-bold text-highlighted">
+              {{ visitorSituationsTable?.count ?? 0 }}
+            </p>
           </div>
         </div>
       </UCard>
@@ -110,6 +151,20 @@ const tabs = [
           icon="i-lucide-layers"
           placeholder="Buscar por nome..."
           example="Ex: 1ª Seção"
+        />
+      </template>
+
+      <template #visitorSituations>
+        <AdminCrudTable
+          ref="visitorSituationsTable"
+          resource="visitor-situations"
+          :read-only="readOnly"
+          field="name"
+          field-label="Nome"
+          title="Situações"
+          icon="i-lucide-user-check"
+          placeholder="Buscar por nome..."
+          example="Ex: Civil"
         />
       </template>
     </UTabs>

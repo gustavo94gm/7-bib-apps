@@ -1,12 +1,5 @@
-import { pgTable, pgEnum, bigserial, bigint, varchar, text, timestamp, date, time, primaryKey, unique, integer, real, jsonb } from "drizzle-orm/pg-core"
+import { pgTable, bigserial, bigint, varchar, text, timestamp, date, time, primaryKey, unique, integer, real, jsonb } from "drizzle-orm/pg-core"
 import { user } from "./auth-schema"
-
-export const visitorSituationEnum = pgEnum("visitor_situation", [
-	"civil",
-	"inativo_pensionista",
-	"militar_outra_om",
-	"militar_reserva",
-])
 
 export const categories = pgTable("categories", {
 	id: bigserial({ mode: 'number' }).primaryKey(),
@@ -38,6 +31,13 @@ export const sections = pgTable("sections", {
 }, (table) => [
 	unique("uni_sections_name").on(table.name),]);
 
+export const visitorSituations = pgTable("visitor_situations", {
+	id: bigserial({ mode: 'number' }).primaryKey(),
+	name: varchar({ length: 255 }),
+	createdAt: timestamp("created_at", { withTimezone: true }),
+}, (table) => [
+	unique("uni_visitor_situations_name").on(table.name),]);
+
 export const ticketAssignees = pgTable("ticket_assignees", {
 	ticketId: bigint("ticket_id", { mode: 'number' }).references(() => tickets.id),
 	userId: text("user_id").references(() => user.id),
@@ -51,7 +51,7 @@ export const visitorLogs = pgTable("visitor_logs", {
 	name: text(),
 	badgeNumber: varchar("badge_number", { length: 50 }),
 	destination: text(),
-	situation: visitorSituationEnum("situation"),
+	situationId: bigint("situation_id", { mode: 'number' }).references(() => visitorSituations.id),
 	visitDate: date("visit_date"),
 	entryTime: time("entry_time"),
 	exitTime: time("exit_time"),

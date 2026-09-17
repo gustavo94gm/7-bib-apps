@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     name: body.name,
     badgeNumber: body.badgeNumber,
     destination: body.destination,
-    situation: body.situation,
+    situationId: body.situationId,
     visitDate: body.visitDate,
     entryTime: body.entryTime,
     exitTime: body.exitTime || null,

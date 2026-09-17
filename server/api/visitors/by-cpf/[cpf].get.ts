@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const cpf = getRouterParam(event, 'cpf');
 
   const [visitor] = await db
-    .select({ name: visitorLogs.name, situation: visitorLogs.situation })
+    .select({ name: visitorLogs.name, situationId: visitorLogs.situationId })
     .from(visitorLogs)
     .where(eq(visitorLogs.cpf, cpf!))
     .orderBy(desc(visitorLogs.createdAt))

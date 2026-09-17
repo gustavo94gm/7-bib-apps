@@ -13,7 +13,7 @@ interface VisitorLog {
   name: string | null
   badgeNumber: string | null
   destination: string | null
-  situation: string | null
+  situation: { id: number; name: string | null } | null
   visitDate: string | null
   entryTime: string | null
   exitTime: string | null
@@ -148,7 +148,7 @@ const columns = [
           <span class="text-sm">{{ row.original.destination ?? '—' }}</span>
         </template>
         <template #situation-cell="{ row }">
-          <span class="text-sm">{{ formatSituation(row.original.situation) }}</span>
+          <span class="text-sm">{{ row.original.situation?.name ?? '—' }}</span>
         </template>
         <template #visitDate-cell="{ row }">
           <span class="text-sm text-muted">{{ formatDateOnly(row.original.visitDate) }}</span>
