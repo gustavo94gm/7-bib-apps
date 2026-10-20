@@ -33,7 +33,7 @@ const sectionOptions = computed(() =>
 async function submit() {
   loading.value = true
   try {
-    await $fetch('/api/tickets', {
+    const ticket = await $fetch('/api/tickets', {
       method: 'POST',
       body: {
         title: form.title,
@@ -44,7 +44,7 @@ async function submit() {
         requesterSectionId: form.requesterSectionId,
       },
     })
-    toast.add({ title: 'Chamado aberto com sucesso!', color: 'success' })
+    toast.add({ title: `Chamado #${ticket.id} aberto com sucesso!`, color: 'success' })
     router.push('/')
   } catch {
     toast.add({ title: 'Erro ao abrir chamado.', color: 'error' })

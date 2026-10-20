@@ -1,0 +1,2 @@
+ALTER TABLE "comments" DROP CONSTRAINT "comments_author_id_user_id_fkey", ADD CONSTRAINT "comments_author_id_user_id_fkey" FOREIGN KEY ("author_id") REFERENCES "user"("id") ON DELETE SET NULL;--> statement-breakpoint
+ALTER TABLE "ticket_assignees" DROP CONSTRAINT "ticket_assignees_user_id_user_id_fkey", ADD CONSTRAINT "ticket_assignees_user_id_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE;

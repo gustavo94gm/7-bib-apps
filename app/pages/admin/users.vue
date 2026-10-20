@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { authClient } from "~~/lib/auth-client";
+import { authClient } from '~~/lib/auth-client';
 
 useSeoMeta({
-  title: "Gerenciar Usuários",
-  description: "Gerencie os usuários do sistema.",
+  title: 'Gerenciar Usuários',
+  description: 'Gerencie os usuários do sistema.',
 });
 
 const toast = useToast();
@@ -22,12 +22,14 @@ interface SystemUser {
   createdAt: string;
 }
 
-const role = computed(() => (session.value?.user as any)?.role as string | undefined);
-const canManageUsers = computed(() => role.value === "admin");
+const role = computed(
+  () => (session.value?.user as any)?.role as string | undefined,
+);
+const canManageUsers = computed(() => role.value === 'admin');
 
 const users = ref<SystemUser[]>([]);
 const loadingUsers = ref(true);
-const globalFilter = ref("");
+const globalFilter = ref('');
 const page = ref(1);
 const pageSize = 10;
 const totalUsers = ref(0);
@@ -35,10 +37,10 @@ const totalUsers = ref(0);
 async function fetchUsers() {
   loadingUsers.value = true;
   try {
-    users.value = await $fetch<SystemUser[]>("/api/users");
+    users.value = await $fetch<SystemUser[]>('/api/users');
     totalUsers.value = users.value.length;
   } catch {
-    toast.add({ title: "Erro ao carregar usuários.", color: "error" });
+    toast.add({ title: 'Erro ao carregar usuários.', color: 'error' });
   } finally {
     loadingUsers.value = false;
   }
@@ -53,12 +55,12 @@ const filteredUsers = computed(() => {
     (u) =>
       u.name?.toLowerCase().includes(q) ||
       u.email?.toLowerCase().includes(q) ||
-      u.role?.toLowerCase().includes(q)
+      u.role?.toLowerCase().includes(q),
   );
 });
 
 const totalPages = computed(() =>
-  Math.max(1, Math.ceil(filteredUsers.value.length / pageSize))
+  Math.max(1, Math.ceil(filteredUsers.value.length / pageSize)),
 );
 
 const pagedUsers = computed(() => {
@@ -71,31 +73,31 @@ watch(globalFilter, () => {
 });
 
 const columns = [
-  { id: "user", header: "Usuário" },
-  { id: "email", header: "Email" },
-  { id: "role", header: "Role" },
-  { id: "status", header: "Status" },
-  { id: "createdAt", header: "Criado em" },
-  { id: "actions", header: "Ações" },
+  { id: 'user', header: 'Usuário' },
+  { id: 'email', header: 'Email' },
+  { id: 'role', header: 'Role' },
+  { id: 'status', header: 'Status' },
+  { id: 'createdAt', header: 'Criado em' },
+  { id: 'actions', header: 'Ações' },
 ];
 
 function roleBadgeColor(role: string | null) {
-  if (role === "admin") return "primary";
-  if (role === "rp") return "secondary";
-  if (role === "infor") return "info";
-  return "neutral";
+  if (role === 'admin') return 'primary';
+  if (role === 'rp') return 'secondary';
+  if (role === 'infor') return 'info';
+  return 'neutral';
 }
 
 function roleLabel(role: string | null) {
-  if (role === "admin") return "Admin";
-  if (role === "rp") return "RP";
-  if (role === "infor") return "Infor";
-  return "Sem role";
+  if (role === 'admin') return 'Admin';
+  if (role === 'rp') return 'RP';
+  if (role === 'infor') return 'Infor';
+  return 'Sem role';
 }
 
 const actionLoading = ref<string | null>(null);
 
-async function setRole(userId: string, role: "admin" | "rp" | "infor") {
+async function setRole(userId: string, role: 'admin' | 'rp' | 'infor') {
   actionLoading.value = userId;
   try {
     const { error } = await (authClient as any).admin.setRole({
@@ -105,9 +107,12 @@ async function setRole(userId: string, role: "admin" | "rp" | "infor") {
     if (error) throw error;
     const u = users.value.find((u) => u.id === userId);
     if (u) u.role = role;
-    toast.add({ title: `Role alterada para "${roleLabel(role)}".`, color: "success" });
+    toast.add({
+      title: `Role alterada para "${roleLabel(role)}".`,
+      color: 'success',
+    });
   } catch {
-    toast.add({ title: "Erro ao alterar role.", color: "error" });
+    toast.add({ title: 'Erro ao alterar role.', color: 'error' });
   } finally {
     actionLoading.value = null;
   }
@@ -120,9 +125,9 @@ async function banUser(userId: string) {
     if (error) throw error;
     const u = users.value.find((u) => u.id === userId);
     if (u) u.banned = true;
-    toast.add({ title: "Usuário banido.", color: "warning" });
+    toast.add({ title: 'Usuário banido.', color: 'warning' });
   } catch {
-    toast.add({ title: "Erro ao banir usuário.", color: "error" });
+    toast.add({ title: 'Erro ao banir usuário.', color: 'error' });
   } finally {
     actionLoading.value = null;
   }
@@ -135,9 +140,9 @@ async function unbanUser(userId: string) {
     if (error) throw error;
     const u = users.value.find((u) => u.id === userId);
     if (u) u.banned = false;
-    toast.add({ title: "Usuário desbanido.", color: "success" });
+    toast.add({ title: 'Usuário desbanido.', color: 'success' });
   } catch {
-    toast.add({ title: "Erro ao desbanir usuário.", color: "error" });
+    toast.add({ title: 'Erro ao desbanir usuário.', color: 'error' });
   } finally {
     actionLoading.value = null;
   }
@@ -146,11 +151,13 @@ async function unbanUser(userId: string) {
 async function revokeSessions(userId: string) {
   actionLoading.value = userId;
   try {
-    const { error } = await (authClient as any).admin.revokeUserSessions({ userId });
+    const { error } = await (authClient as any).admin.revokeUserSessions({
+      userId,
+    });
     if (error) throw error;
-    toast.add({ title: "Sessões revogadas com sucesso.", color: "success" });
+    toast.add({ title: 'Sessões revogadas com sucesso.', color: 'success' });
   } catch {
-    toast.add({ title: "Erro ao revogar sessões.", color: "error" });
+    toast.add({ title: 'Erro ao revogar sessões.', color: 'error' });
   } finally {
     actionLoading.value = null;
   }
@@ -160,48 +167,113 @@ function getRowActions(row: SystemUser): any[][] {
   return [
     [
       {
-        label: "Tornar Admin",
-        icon: "i-lucide-shield",
-        disabled: row.role === "admin" || row.id === session.value?.user?.id,
-        onSelect: () => setRole(row.id, "admin"),
+        label: 'Tornar Admin',
+        icon: 'i-lucide-shield',
+        disabled: row.role === 'admin' || row.id === session.value?.user?.id,
+        onSelect: () => setRole(row.id, 'admin'),
       },
       {
-        label: "Tornar RP",
-        icon: "i-lucide-id-card",
-        disabled: row.role === "rp" || row.id === session.value?.user?.id,
-        onSelect: () => setRole(row.id, "rp"),
+        label: 'Tornar RP',
+        icon: 'i-lucide-id-card',
+        disabled: row.role === 'rp' || row.id === session.value?.user?.id,
+        onSelect: () => setRole(row.id, 'rp'),
       },
       {
-        label: "Tornar Infor",
-        icon: "i-lucide-info",
-        disabled: row.role === "infor" || row.id === session.value?.user?.id,
-        onSelect: () => setRole(row.id, "infor"),
+        label: 'Tornar Infor',
+        icon: 'i-lucide-info',
+        disabled: row.role === 'infor' || row.id === session.value?.user?.id,
+        onSelect: () => setRole(row.id, 'infor'),
       },
     ],
     [
       {
-        label: row.banned ? "Desbanir" : "Banir",
-        icon: row.banned ? "i-lucide-user-check" : "i-lucide-user-x",
-        color: row.banned ? "success" : "error",
+        label: row.banned ? 'Desbanir' : 'Banir',
+        icon: row.banned ? 'i-lucide-user-check' : 'i-lucide-user-x',
+        color: row.banned ? 'success' : 'error',
         disabled: row.id === session.value?.user?.id,
         onSelect: () => (row.banned ? unbanUser(row.id) : banUser(row.id)),
       },
       {
-        label: "Revogar Sessões",
-        icon: "i-lucide-log-out",
-        color: "warning",
+        label: 'Revogar Sessões',
+        icon: 'i-lucide-log-out',
+        color: 'warning',
         onSelect: () => revokeSessions(row.id),
+      },
+      {
+        label: 'Alterar Senha',
+        icon: 'i-lucide-key-round',
+        onSelect: () => openPasswordModal(row),
+      },
+    ],
+    [
+      {
+        label: 'Excluir',
+        icon: 'i-lucide-trash-2',
+        color: 'error',
+        disabled: row.id === session.value?.user?.id,
+        onSelect: () => (userToDelete.value = row),
       },
     ],
   ];
 }
 
+const passwordUser = ref<SystemUser | null>(null);
+const newPassword = ref('');
+const passwordLoading = ref(false);
+
+function openPasswordModal(user: SystemUser) {
+  passwordUser.value = user;
+  newPassword.value = '';
+}
+
+async function changePassword() {
+  if (!passwordUser.value) return;
+  passwordLoading.value = true;
+  try {
+    const { error } = await (authClient as any).admin.setUserPassword({
+      userId: passwordUser.value.id,
+      newPassword: newPassword.value,
+    });
+    if (error) throw error;
+    toast.add({ title: 'Senha alterada com sucesso.', color: 'success' });
+    passwordUser.value = null;
+  } catch (e: any) {
+    toast.add({
+      title: e?.message ?? 'Erro ao alterar senha.',
+      color: 'error',
+    });
+  } finally {
+    passwordLoading.value = false;
+  }
+}
+
+const userToDelete = ref<SystemUser | null>(null);
+const deleteLoading = ref(false);
+
+async function deleteUser() {
+  if (!userToDelete.value) return;
+  deleteLoading.value = true;
+  try {
+    const { error } = await (authClient as any).admin.removeUser({
+      userId: userToDelete.value.id,
+    });
+    if (error) throw error;
+    users.value = users.value.filter((u) => u.id !== userToDelete.value!.id);
+    toast.add({ title: 'Usuário excluído.', color: 'success' });
+    userToDelete.value = null;
+  } catch {
+    toast.add({ title: 'Erro ao excluir usuário.', color: 'error' });
+  } finally {
+    deleteLoading.value = false;
+  }
+}
+
 const isCreateModalOpen = ref(false);
 const createForm = reactive({
-  name: "",
-  email: "",
-  password: "",
-  role: "rp" as "admin" | "rp" | "infor",
+  name: '',
+  email: '',
+  password: '',
+  role: 'rp' as 'admin' | 'rp' | 'infor',
 });
 const createLoading = ref(false);
 
@@ -215,21 +287,26 @@ async function createUser() {
       role: createForm.role,
     });
     if (error) throw error;
-    toast.add({ title: "Usuário criado com sucesso!", color: "success" });
+    toast.add({ title: 'Usuário criado com sucesso!', color: 'success' });
     isCreateModalOpen.value = false;
-    Object.assign(createForm, { name: "", email: "", password: "", role: "rp" });
+    Object.assign(createForm, {
+      name: '',
+      email: '',
+      password: '',
+      role: 'rp',
+    });
     await fetchUsers();
   } catch {
-    toast.add({ title: "Erro ao criar usuário.", color: "error" });
+    toast.add({ title: 'Erro ao criar usuário.', color: 'error' });
   } finally {
     createLoading.value = false;
   }
 }
 
 const roleOptions = [
-  { label: "Admin", value: "admin" },
-  { label: "RP", value: "rp" },
-  { label: "Infor", value: "infor" },
+  { label: 'Admin', value: 'admin' },
+  { label: 'RP', value: 'rp' },
+  { label: 'Infor', value: 'infor' },
 ];
 </script>
 
@@ -274,7 +351,7 @@ const roleOptions = [
           <div>
             <p class="text-xs text-muted">Admins</p>
             <p class="text-2xl font-bold text-highlighted">
-              {{ users.filter((u) => u.role === "admin").length }}
+              {{ users.filter((u) => u.role === 'admin').length }}
             </p>
           </div>
         </div>
@@ -282,10 +359,7 @@ const roleOptions = [
       <UCard :ui="{ body: 'p-4' }">
         <div class="flex items-center gap-3">
           <div class="p-2 rounded-lg bg-green-500/10">
-            <UIcon
-              name="i-lucide-user-check"
-              class="text-green-500 text-xl"
-            />
+            <UIcon name="i-lucide-user-check" class="text-green-500 text-xl" />
           </div>
           <div>
             <p class="text-xs text-muted">Ativos</p>
@@ -356,7 +430,7 @@ const roleOptions = [
           <template #email-cell="{ row }">
             <span class="text-sm text-muted">{{ row.original.email }}</span>
           </template>
-          
+
           <template #role-cell="{ row }">
             <UBadge
               :color="roleBadgeColor(row.original.role)"
@@ -383,13 +457,11 @@ const roleOptions = [
             >
               <UIcon
                 :name="
-                  row.original.banned
-                    ? 'i-lucide-ban'
-                    : 'i-lucide-circle-check'
+                  row.original.banned ? 'i-lucide-ban' : 'i-lucide-circle-check'
                 "
                 class="mr-1"
               />
-              {{ row.original.banned ? "Banido" : "Ativo" }}
+              {{ row.original.banned ? 'Banido' : 'Ativo' }}
             </UBadge>
           </template>
 
@@ -423,7 +495,7 @@ const roleOptions = [
         >
           <p class="text-sm text-muted">
             {{ filteredUsers.length }} usuário{{
-              filteredUsers.length !== 1 ? "s" : ""
+              filteredUsers.length !== 1 ? 's' : ''
             }}
             · Página {{ page }} de {{ totalPages }}
           </p>
@@ -439,18 +511,13 @@ const roleOptions = [
           v-if="!loadingUsers && filteredUsers.length === 0"
           class="flex flex-col items-center justify-center py-16 text-center"
         >
-          <UIcon
-            name="i-lucide-users"
-            class="text-4xl text-muted mb-3"
-          />
-          <p class="font-medium text-highlighted">
-            Nenhum usuário encontrado
-          </p>
+          <UIcon name="i-lucide-users" class="text-4xl text-muted mb-3" />
+          <p class="font-medium text-highlighted">Nenhum usuário encontrado</p>
           <p class="text-sm text-muted mt-1">
             {{
               globalFilter
-                ? "Tente mudar os termos de busca."
-                : "Crie o primeiro usuário clicando em \"Novo Usuário\"."
+                ? 'Tente mudar os termos de busca.'
+                : 'Crie o primeiro usuário clicando em "Novo Usuário".'
             }}
           </p>
         </div>
@@ -538,6 +605,100 @@ const roleOptions = [
               />
             </div>
           </form>
+        </UCard>
+      </template>
+    </UModal>
+
+    <UModal
+      :open="!!passwordUser"
+      :ui="{ content: 'max-w-md' }"
+      @update:open="(v) => !v && (passwordUser = null)"
+    >
+      <template #content>
+        <UCard>
+          <template #header>
+            <h2 class="text-lg font-semibold text-highlighted">
+              Alterar Senha
+            </h2>
+            <p class="text-sm text-muted">
+              Defina uma nova senha para {{ passwordUser?.name }}.
+            </p>
+          </template>
+
+          <form class="space-y-4" @submit.prevent="changePassword">
+            <UFormField label="Nova senha" required>
+              <UInput
+                v-model="newPassword"
+                type="password"
+                placeholder="Mínimo 8 caracteres"
+                icon="i-lucide-lock"
+                minlength="8"
+                required
+                class="w-full"
+              />
+            </UFormField>
+
+            <div class="flex justify-end gap-2 pt-2">
+              <UButton
+                type="button"
+                variant="ghost"
+                color="neutral"
+                label="Cancelar"
+                @click="passwordUser = null"
+              />
+              <UButton
+                type="submit"
+                icon="i-lucide-key-round"
+                :loading="passwordLoading"
+                label="Salvar Senha"
+              />
+            </div>
+          </form>
+        </UCard>
+      </template>
+    </UModal>
+
+    <UModal
+      :open="!!userToDelete"
+      :ui="{ content: 'max-w-md' }"
+      @update:open="(v) => !v && (userToDelete = null)"
+    >
+      <template #content>
+        <UCard>
+          <template #header>
+            <h2 class="text-lg font-semibold text-highlighted">
+              Excluir Usuário
+            </h2>
+          </template>
+
+          <div class="space-y-2 text-sm">
+            <p>
+              Excluir <strong>{{ userToDelete?.name }}</strong> ({{
+                userToDelete?.email
+              }})? Esta ação não pode ser desfeita.
+            </p>
+            <p class="text-muted">
+              Os chamados são mantidos. O usuário será removido dos chamados aos
+              quais está atribuído e seus comentários continuarão visíveis com o
+              nome original.
+            </p>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-4">
+            <UButton
+              variant="ghost"
+              color="neutral"
+              label="Cancelar"
+              @click="userToDelete = null"
+            />
+            <UButton
+              color="error"
+              icon="i-lucide-trash-2"
+              :loading="deleteLoading"
+              label="Excluir"
+              @click="deleteUser"
+            />
+          </div>
         </UCard>
       </template>
     </UModal>

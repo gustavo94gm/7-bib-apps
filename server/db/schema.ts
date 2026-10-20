@@ -11,7 +11,7 @@ export const categories = pgTable("categories", {
 export const comments = pgTable("comments", {
 	id: bigserial({ mode: 'number' }).primaryKey(),
 	ticketId: bigint("ticket_id", { mode: 'number' }),
-	authorId: text("author_id").references(() => user.id),
+	authorId: text("author_id").references(() => user.id, { onDelete: "set null" }),
 	authorName: varchar("author_name", { length: 255 }),
 	content: text(),
 	createdAt: timestamp("created_at", { withTimezone: true }),
@@ -40,7 +40,7 @@ export const visitorSituations = pgTable("visitor_situations", {
 
 export const ticketAssignees = pgTable("ticket_assignees", {
 	ticketId: bigint("ticket_id", { mode: 'number' }).references(() => tickets.id),
-	userId: text("user_id").references(() => user.id),
+	userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
 }, (table) => [
 	primaryKey({ columns: [table.ticketId, table.userId], name: "ticket_assignees_pkey"}),
 ]);
