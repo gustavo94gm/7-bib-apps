@@ -166,7 +166,7 @@ const themeItems = computed<DropdownMenuItem[][]>(() => [userItems.value[0]!]);
       <template #header>
         <img src="../assets/logo7bib.jpg" class="w-10 rounded-2xl" />
         <USeparator orientation="vertical" />
-        <p>Desenvolvido por Sd Ev Gustavo Mueller</p>
+        <p>Sistema de pedidos e visitantes 7º BIB</p>
       </template>
 
       <template #default="{ state }">
@@ -224,7 +224,7 @@ const themeItems = computed<DropdownMenuItem[][]>(() => [userItems.value[0]!]);
       </template>
     </USidebar>
 
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 min-w-0 flex flex-col">
       <div
         class="h-(--ui-header-height) shrink-0 flex items-center px-4 border-b border-default"
       >
@@ -237,7 +237,7 @@ const themeItems = computed<DropdownMenuItem[][]>(() => [userItems.value[0]!]);
         />
       </div>
 
-      <div class="flex-1 py-10 px-10">
+      <div class="flex-1 py-6 px-4 sm:py-10 sm:px-10">
         <slot />
       </div>
     </div>
