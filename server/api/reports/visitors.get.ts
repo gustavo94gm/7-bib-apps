@@ -1,6 +1,6 @@
 import { db } from '~~/server/index'
 import { visitorLogs, visitorSituations } from '../../db/schema'
-import { ilike, and, gte, lte, desc, eq, SQL } from 'drizzle-orm'
+import { ilike, and, gte, lte, eq, sql, SQL } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -36,5 +36,9 @@ export default defineEventHandler(async (event) => {
     .from(visitorLogs)
     .leftJoin(visitorSituations, eq(visitorLogs.situationId, visitorSituations.id))
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .orderBy(desc(visitorLogs.visitDate))
+    .orderBy(
+      sql`${visitorLogs.visitDate} desc nulls last`,
+      sql`${visitorLogs.entryTime} desc nulls last`,
+      sql`${visitorLogs.createdAt} desc nulls last`,
+    )
 })
