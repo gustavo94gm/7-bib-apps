@@ -7,6 +7,7 @@ const PUBLIC_ROUTES = [
   { method: 'GET', path: '/api/graduations' },
   { method: 'GET', path: '/api/sections' },
   { method: 'GET', path: '/api/visitor-situations' },
+  { method: 'GET', path: '/api/tickets/public' },
 ]
 
 const DATABASE_RESOURCES = ['categories', 'graduations', 'sections', 'visitor-situations']
