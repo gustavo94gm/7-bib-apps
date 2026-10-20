@@ -2,7 +2,9 @@ import { db } from '~~/server/index'
 import { visitorLogs, visitorSituations } from '../db/schema'
 import { desc, eq } from 'drizzle-orm'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  const date = getQuery(event).date as string | undefined
+
   return db
     .select({
       id: visitorLogs.id,
@@ -21,5 +23,6 @@ export default defineEventHandler(async () => {
     })
     .from(visitorLogs)
     .leftJoin(visitorSituations, eq(visitorLogs.situationId, visitorSituations.id))
+    .where(date ? eq(visitorLogs.visitDate, date) : undefined)
     .orderBy(desc(visitorLogs.createdAt))
 })

@@ -9,7 +9,7 @@ const router = useRouter();
 
 const { visitorSituations } = await useLookups();
 
-const today = new Date().toISOString().slice(0, 10);
+const today = new Date().toLocaleDateString('sv-SE');
 const now = new Date().toTimeString().slice(0, 5);
 
 const form = reactive({
@@ -24,7 +24,10 @@ const form = reactive({
 });
 
 const situationOptions = computed(() =>
-  (visitorSituations.value ?? []).map((s: any) => ({ label: s.name, value: s.id })),
+  (visitorSituations.value ?? []).map((s: any) => ({
+    label: s.name,
+    value: s.id,
+  })),
 );
 
 function formatCpf(value: string) {
@@ -65,9 +68,10 @@ const cpfValid = computed(() => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(form.cpf));
 
 watch(cpfValid, async (valid) => {
   if (!valid) return;
-  const visitor = await $fetch<{ name: string; situationId: number | null } | null>(
-    `/api/visitors/by-cpf/${form.cpf}`,
-  ).catch(() => null);
+  const visitor = await $fetch<{
+    name: string;
+    situationId: number | null;
+  } | null>(`/api/visitors/by-cpf/${form.cpf}`).catch(() => null);
   if (!visitor) return;
   form.name = visitor.name;
   form.situationId = visitor.situationId;

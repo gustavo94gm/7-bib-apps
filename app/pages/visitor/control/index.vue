@@ -24,7 +24,9 @@ const actionLoading = ref<number | null>(null)
 async function fetchVisitors() {
   loading.value = true
   try {
-    visitors.value = await $fetch<VisitorLog[]>('/api/visitors')
+    visitors.value = await $fetch<VisitorLog[]>('/api/visitors', {
+      query: { date: new Date().toLocaleDateString('sv-SE') },
+    })
   } catch {
     toast.add({ title: 'Erro ao carregar visitantes.', color: 'error' })
   } finally {

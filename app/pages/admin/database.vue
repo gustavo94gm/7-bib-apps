@@ -110,7 +110,12 @@ const tabs = [
       </UCard>
     </div>
 
-    <UTabs v-model="activeTab" :items="tabs" :ui="{ list: 'mb-4' }">
+    <UTabs
+      v-model="activeTab"
+      :items="tabs"
+      :unmount-on-hide="false"
+      :ui="{ list: 'mb-4' }"
+    >
       <template #categories>
         <AdminCrudTable
           ref="categoriesTable"
