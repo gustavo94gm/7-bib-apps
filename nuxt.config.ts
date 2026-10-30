@@ -5,4 +5,5 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui'],
   css: ['~/assets/css/main.css'],
   ui: { fonts: false },
+  sourcemap: { server: false, client: false },
 });

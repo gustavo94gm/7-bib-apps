@@ -1,5 +1,8 @@
-FROM oven/bun:1.4.2-alpine AS build
+FROM node:24-alpine AS build
+COPY --from=oven/bun:1.4.2-alpine /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /app
+
+ENV NODE_OPTIONS=--max-old-space-size=1024
 
 COPY package.json bun.lock ./
 
